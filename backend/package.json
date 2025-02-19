@@ -1,0 +1,18 @@
+{
+  "name": "natura-avon-auto-messager-backend",
+  "version": "1.0.0",
+  "main": "main.js",
+  "scripts": {
+    "start": "node main.js"
+  },
+  "author": "@ropsoft",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "shelljs": "^0.8.5",
+    "venom-bot": "^5.3.0",
+    "ws": "^8.18.0"
+  }
+}

@@ -1,0 +1,17 @@
+{
+    "name": "natura-avon-auto-messager-client",
+    "version": "1.0.0",
+    "description": "Messager dispatcher for Avon & Natura leaders",
+    "main": "main.js",
+    "scripts": {
+        "start": "neu run"
+    },
+    "author": "@ropsoft",
+    "license": "ISC",
+    "dependencies": {
+        "windows-shortcuts": "^0.1.6"
+    },
+    "devDependencies": {
+        "@neutralinojs/neu": "^11.3.1"
+    }
+}

@@ -1,24 +1,14 @@
 {
-    "name": "natura-avon-auto-messager-client",
-    "version": "1.0.0",
-    "description": "Messager dispatcher for Avon & Natura leaders",
-    "main": "main.js",
-    "scripts": {
-        "start": "npm run backend & sleep 3; npm run neutralino",
-        "backend": "node backend/main.js",
-        "neutralino": "neu run"
-    },
-    "author": "@ropsoft",
-    "license": "ISC",
-    "dependencies": {
-        "cors": "^2.8.5",
-        "express": "^4.21.2",
-        "shelljs": "^0.8.5",
-        "venom-bot": "^5.3.0",
-        "windows-shortcuts": "^0.1.6",
-        "ws": "^8.18.0"
-    },
-    "devDependencies": {
-        "@neutralinojs/neu": "^11.3.1"
-    }
+  "name": "natura-avon-auto-messager",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "npm run killallproc; npm run backend & sleep; npm run frontend",
+    "backend": "cd backend; npm start",
+    "frontend": "cd frontend; npm start",
+    "killallproc": "killall -9 node; killall -9 chrome"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": ""
 }

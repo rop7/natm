@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link href="./lib/vuetify.min.css" rel="stylesheet">
+    <link href="./lib/mdi.min.css" rel="stylesheet">
+    <link href="./lib/toastify.min.css" rel="stylesheet">
+    <link href="./lib/styles.css" rel="stylesheet">
+    <link href="./style.css" rel="stylesheet">
+
+    <title>Natura & Avon - Auto Messager</title>
+
+</head>
+
+<body>
+
+     <div id="app">
+
+        <v-app 
+            style="min-width: 100% !important;"
+            :loading="loading">
+            
+            <v-container 
+                class="ma-0" 
+                id="appContainer"
+                style="min-width: 100%; min-height: calc(100vh); padding-bottom: 0; opacity: 0;">
+
+                <v-row 
+                    style="height: calc(100vh - 10px)">
+                    
+                    <v-col col="9" md="9" id="leftSide" class="pa-0">
+                        
+                        <v-data-table 
+                            :loading="loading" 
+                            height="100"
+                            :items-per-page="100"
+                            fixed-header
+                            fixed-footer
+                            :search="textSearch"
+                            :headers="tableHeaders"
+                            :items="tableDataFiltered" 
+                            style="height: calc(100%); max-height: 100%; border-radius: 0; font-size: 90% !important; overflow: scroll !important">
+                                
+                              <template v-slot:top>
+
+                                <v-row style="position: fixed; width: calc(100% - 24.3vw); background-color: #1e1e1e; z-index: 99; left: 0;">
+
+                                    <v-col cols="6" md="6" class="pt-6 pr-0 pl-1 mt-0 pt-0">
+                                        <v-text-field
+                                            outlined
+                                            dense
+                                            :loading="isSeondingMessages"
+                                            v-model="textSearch"
+                                            label="Digite para pesquisar..."
+                                            class="pa-3 pb-0 ml-0 mr-0 mt-0 ml-2" />
+                                    </v-col>
+
+                                    <v-col cols="2" md="2" class="pt-3 ml-0 mr-0 pt-6 pl-0 pr-0 mt-0 pt-0">
+                                        <v-select
+                                            outlined
+                                            clearable
+                                            dense
+                                            :loading="isSeondingMessages"
+                                            :disabled="isSeondingMessages"
+                                            label="Select"
+                                            :items="tableFilterProperties"
+                                            v-model="addingFilterProperty"
+                                            style="position: relative; z-index: 999;"
+                                            class="pa-3 pb-0 ml-0 mr-0 mt-0 pl-1 pr-1">
+                                        </v-select>
+                                    </v-col>
+
+                                    <v-col cols="2" md="2" class="pt-6 ml-0 mr-0 pl-0 pr-0 mt-0 pt-0">
+
+                                        <v-select
+                                            outlined
+                                            clearable
+                                            dense
+                                            :loading="isSeondingMessages"
+                                            :disabled="isSeondingMessages"
+                                            label="Select"
+                                            :items="tableFilterValues"
+                                            v-model="addingFilterValue"
+                                            class="pa-3 pb-0 ml-0 mr-0 mt-0 pl-1 pr-1">
+                                        </v-select>
+                                    </v-col>
+
+                                    <v-col cols="2" md="2" class="pt-3 pl-0 pt-9 pl-1 pr-5">
+
+                                        <v-btn 
+                                            block 
+                                            :loading="isSeondingMessages"
+                                            :disabled="isSeondingMessages"
+                                            color="secondary" 
+                                            @click="addTableFilter"
+                                            style="border-radius: 0; text-transform: lowercase; height: calc(100% - 3px);">+ add filtro</v-btn>
+
+                                    </v-col>
+
+                                    <v-col cols="12" md="12" class="pa-2 mr-0 pl-6" style="z-index: 0;border: 1px solid #323232; border-right: none !important; width: calc(100%); max-width: calc(100%)">
+
+                                        <v-chip-group>
+
+                                            <span style="line-height: 230%;">
+                                                Filtros
+                                                <v-icon small class="mr-1">mdi-filter</v-icon>
+                                            </span>
+
+                                            <v-chip 
+                                                v-for="filter in tableFilters" 
+                                                multiple
+                                                small
+                                                :key="filter.text">
+
+                                                <span class="mr-3">{{filter.text}}</span>
+
+                                                <i @click="removeTableFilter(filter)"
+                                                    class="v-icon notranslate v-chip__filter v-icon--left mdi mdi-close-circle theme--dark" 
+                                                    style="font-size: 125%;"></i>
+
+                                            </v-chip>
+
+                                        </v-chip-group>
+
+                                    </v-col>
+    
+                                </v-row>
+
+                              </template>
+
+                        </v-data-table>
+
+                    </v-col>
+   
+                    <v-col col="3" md="3" id="rightSide" class="pt-0 mt-0 mb-0 mt-0 pt-0 mt-0" style="z-index: 0; height: 14vh">
+
+                        <v-card
+                            class="mx-auto pt-6"
+                            style="max-width: 500px; width: 99.5%; position: relative; left: 3px; height: 100vh; margin-left: 0 !important; margin-right: 0 !important; border-left: 1px solid #323232;">
+
+                                <v-row>
+
+                                    <v-col cols="8" md="8" class="mr-0 pr-0 pt-0">
+
+                                        <v-btn
+                                            block 
+                                            color="secondary"
+                                            class="mb-2"
+                                            :loading="isSeondingMessages"
+                                            style="border-radius: 0; text-transform: lowercase;"
+                                            @click="dispatchCsvInput" 
+                                            color="primary">
+                                            Importar .CSV
+                                        </v-btn>
+                                                                        
+                                        <v-btn
+                                            block
+                                            color="secondary"
+                                            :loading="isSeondingMessages"
+                                            style="border-radius: 0; text-transform: lowercase;"
+                                            @click="tableData = []" 
+                                            color="primary">
+                                            Limpar tabela
+                                            <v-icon small class="ml-2">mdi-close-circle</v-icon>
+                                        </v-btn>
+
+                                    </v-col>
+
+                                    <v-col cols="4" md="4" class="ml-0 pl-0 pt-0">
+                                        <v-img src="asset/icon.png" style="height: 65%;" class="pa-0 ma-0"></v-img>
+                                    </v-col>
+
+                                </v-row>
+
+                                <v-col cols="12" md="12" v-if="checkingWhatsappConnection">
+                                    <v-progress-circular
+                                        indeterminate
+                                        size="175"
+                                        color="green"
+                                        style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);" />
+                                        <span style="width: 300px; top: 150px; position: relative;">
+                                            Verificando conexão com WhatsApp...
+                                        </span>
+                                </v-col>
+
+                                <v-col 
+                                    v-if="!checkingWhatsappConnection"
+                                    cols="12"
+                                    md="12" 
+                                    style="margin-top: -15%; padding-left: 0; padding-right: 0;">
+                                    
+                                    <v-toolbar
+                                        cards
+                                        dark
+                                        flat
+                                        color="deep-purple-accent-4">
+
+                                        <v-row>
+
+                                            <v-col cols="5" md="5">
+                                                <v-text-field 
+                                                    outlined
+                                                    style="position: relative; top: 7px;"
+                                                    label="Delay"
+                                                    type="number"
+                                                    v-model="messageDelay"
+                                                    control-variant="stacked">
+                                                </v-text-field>  
+                                            </v-col>
+                                            
+                                            <v-col cols="7" md="7">
+                                                <v-checkbox
+                                                    style="position: relative; top: 21px;"
+                                                    outlined
+                                                    v-model="removeDuplicates"
+                                                    color="deep-purple">
+                                                    <template v-slot:label>
+                                                        <span>Remover duplicidades</span>
+                                                    </template>
+                                                </v-checkbox>
+
+                                            </v-col>
+
+                                            <v-col cols="2" md="2" class="pr-0 pl-1">
+
+                                                <v-btn
+                                                    block
+                                                    dense
+                                                    color="secondary"
+                                                    class="mb-2 pr-0 pl-0"
+                                                    :loading="isSeondingMessages"
+                                                    style="border-radius: 0; text-transform: lowercase"
+                                                    @click="openTemplatedMessagesList" 
+                                                    color="primary">
+                                                    <v-icon small>mdi-script-text</v-icon>
+                                                </v-btn>
+
+                                            </v-col>
+
+                                            <v-col cols="6" md="6" class="pr-0 pl-1">
+
+                                                <v-btn
+                                                    block
+                                                    dense
+                                                    color="secondary"
+                                                    class="mb-2 pr-0 pl-0"
+                                                    :loading="isSeondingMessages"
+                                                    style="border-radius: 0; text-transform: lowercase"
+                                                    @click="fileSelect" 
+                                                    color="primary">
+                                                    + Anexo
+                                                    <v-icon small class="ml-2">mdi-file</v-icon>
+                                                </v-btn>
+
+                                                <v-chip-group style="position: relative; bottom: 5px; width: 100%;">
+
+                                                    <v-chip small v-show="filePath">
+
+                                                        <span>{{fileName}}</span>
+                                                        
+                                                        <i @click="removeFilePathAndName"
+                                                            class="ml-2 v-icon notranslate v-chip__filter v-icon--left mdi mdi-close-circle theme--dark" 
+                                                            style="font-size: 125%;"></i>
+                                                    
+                                                    </v-chip>
+    
+                                                    <!-- <v-chip small v-show="audioPath">
+                                                    
+                                                        <span>{{audioName}}</span>
+
+                                                        <i @click="removeAudioPathAndName"
+                                                            class="ml-2 v-icon notranslate v-chip__filter v-icon--left mdi mdi-close-circle theme--dark" 
+                                                            style="font-size: 125%;"></i>
+                                                    
+                                                    </v-chip> -->
+
+                                                </v-chip-group>
+
+                                            </v-col>
+
+                                            <v-col cols="4" md="4" class="pr-0 pl-1">
+
+                                                <v-menu open-on-hover id="variablesMenu" style="top: 260px">
+
+                                                    <template v-slot:activator="{ on }">
+                                                        <v-btn
+                                                            block
+                                                            style="border-radius: 0; text-transform: lowercase; border: 1px solid rgba(255,255,255,0.3); background-color: rgba(66,66,66,0.3) !important;"
+                                                            color="secondary"
+                                                            class="pr-0 pl-0"
+                                                            v-on="on">
+                                                            Variáveis
+                                                            <v-icon class="ml-2">mdi-menu-down</v-icon>
+                                                        </v-btn>
+                                                    </template>
+
+                                                    <v-list>
+                                                        <v-list-item
+                                                            style="font-size: 90%; min-height: 21px; height: 21px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.1) !important;"
+                                                            v-for="(varr, index) in tableFilterPropertiesAll"
+                                                            @click="appendVariableToTextarea(varr)">
+                                                            {{ varr }}
+                                                        </v-list-item>
+                                                    </v-list>
+                                                </v-menu>
+
+                                            </v-col>
+                                            
+                                            <!-- <v-col cols="6" md="6" class="ml-0 pl-0">
+
+                                                <v-btn
+                                                    block
+                                                    dense
+                                                    color="secondary"
+                                                    class="mb-2 pl-0"
+                                                    :loading="isSeondingMessages"
+                                                    style="border-radius: 0; text-transform: lowercase"
+                                                    @click="audioSelect" 
+                                                    color="primary">
+                                                    + áudio
+                                                    <v-icon small class="ml-2">mdi-music-circle-outline</v-icon>
+                                                </v-btn>
+
+                                            </v-col> -->
+
+                                            <!-- <v-col cols="12" md="12" class="pt-0" v-if="fileName || audioName">
+                                                
+                                            </v-col> -->
+                                        
+                                        </v-row>
+
+
+                                    </v-toolbar>
+                                    
+                                    <v-form
+                                        ref="form"
+                                        class="pa-3 mt-0"
+                                        v-if="venomClientConnected">
+
+                                        <v-textarea
+                                            id="messageTextArea"
+                                            :rows="19"
+                                            style="height: 35vh; background-color: rgba(238, 232, 170, 1); border-radius: 3px !important; color: #1e1e1e !important; font-size: 105%;"
+                                            class="pa-3 mt-0 pt-0"
+                                            bg-color="darken darken"
+                                            color="secondary"
+                                            :disabled="isSeondingMessages"
+                                            v-model="message" />
+                                    </v-form>
+
+                                    <div v-else
+                                        style="height: auto; background-color: rgba(238, 119, 0, 0.7); border-radius: 0px !important; color: whitesmoke!important; font-size: 0.9vw !important;"
+                                        class="pa-3 ma-3 mt-3"
+                                        bg-color="darken darken"
+                                        color="secondary">
+
+                                        <span v-if="checkWhatsappConnectionError">
+                                            Erro ao verificar conexão com WhatsApp
+                                            <hr>
+                                            <br>
+                                            <small style="color: whitesmoke">{{ checkWhatsappConnectionError }}</small>
+                                        </span>
+                                        
+                                        <span v-else>
+                                            Sessão WhatsApp não encontrada.
+                                        </span>
+
+                                    </div>
+
+                                    <v-divider></v-divider>
+
+                                    <v-card-actions v-if="venomClientConnected && environment !== 'offline'">
+
+                                        <v-btn
+                                            :loading="isSeondingMessages"
+                                            variant="text"
+                                            style="border-radius: 0; text-transform: lowercase;"
+                                            @click="message = ''">
+                                            Limpar
+                                        </v-btn>
+
+                                        <v-btn
+                                            variant="text"
+                                            style="border-radius: 0; text-transform: lowercase;"
+                                            @click="requestSendMessagesCancel">
+                                            cancelar
+                                            <v-icon small class="ml-3">mdi-cancel</v-icon>
+                                        </v-btn>
+
+                                        <v-spacer></v-spacer>
+
+                                        <v-btn 
+                                            :loading="isSeondingMessages"
+                                            color="secondary"
+                                            style="border-radius: 0; text-transform: lowercase;"
+                                            class="mt-3"
+                                            label="salvar mensagem"
+                                            @click="saveAsTemplatedMessage">
+                                            salvar
+                                            <v-icon class="ml-3" small>mdi-content-save</v-icon>
+                                        </v-btn>
+
+                                        <v-btn 
+                                            :loading="isSeondingMessages"
+                                            color="secondary"
+                                            style="border-radius: 0; text-transform: lowercase;"
+                                            class="mt-3"
+                                            @click="openSendMessagesConfirmation" 
+                                            label="enviar mensagem">
+                                            enviar
+                                            <v-icon class="ml-3" small>mdi-send</v-icon>
+                                        </v-btn>
+
+                                    </v-card-actions>
+
+                                    <v-card-actions v-else>
+
+                                        <v-row>
+                                            
+                                            <v-col class="pb-0">
+                                                
+                                                <v-btn
+                                                    block
+                                                    v-if="!checkWhatsappConnectionError"
+                                                    variant="text"
+                                                    style="border-radius: 0; text-transform: lowercase;"
+                                                    @click="connectToWhatsapp">
+                                                    Conectar ao WhatsApp
+                                                    <v-icon class="ml-2">mdi-whatsapp</v-icon>
+                                                </v-btn>
+
+                                                <v-btn
+                                                    block
+                                                    v-else
+                                                    variant="text"
+                                                    style="border-radius: 0; text-transform: lowercase;"
+                                                    @click="restartApp">
+                                                    Reiniciar aplicativo
+                                                    <v-icon class="ml-2">mdi-refresh</v-icon>
+                                                </v-btn>
+                                            </v-col>
+
+                                        </v-row>
+
+                                    </v-card-actions>
+
+                                </v-col>
+
+                                <v-row v-if="!checkingWhatsappConnection && venomClientConnected">
+                                    <v-col>
+                                        <div class="console-container">
+                                            <div class="console-body" ref="logContainer">
+                                            <pre v-for="(log, index) in messagesFromBackend" :key="index">{{ log }}</pre>
+                                            </div>
+                                        </div>
+                                    </v-col>  
+                                </v-row>
+                        </v-card>
+
+                    </v-col>
+
+                    <v-overlay
+                        :value="loadingOverlay"
+                        class="align-center justify-center">
+                        <v-progress-circular
+                            color="primary"
+                            size="64"
+                            indeterminate></v-progress-circular>
+                    </v-overlay>
+
+                    <span>
+                        <v-file-input
+                            v-model="csvFile" 
+                            ref="csvInput"
+                            color="blue"
+                            style="display: none;"
+                            @input="parseCSV"
+                            @change="parseCSV" />
+                    </span>
+
+                    <v-dialog v-model="dialog.isVisible" 
+                              :width="dialog.dialogRole === 'templatedMessagesList' ? '1250px' : '350px'"
+                              :style="{ height: dialog.dialogRole === 'templatedMessagesList' ? '650px' : '150px' }">
+
+                        <v-card style="padding: 5px;
+                                        padding-top: 10px;
+                                        border: 1px solid rgba(255,255,255,0.1)">
+        
+                            <div v-if="dialog.isVisible">
+        
+                                <small style="margin-bottom: 14px !important; display: inline-block;" class="ml-4" v-if="dialog.dialogRole === 'displayMessage'">Iniciar disparo para {{tableDataFiltered.length}} contatos?</small>
+        
+                                <v-list v-if="dialog.dialogRole === 'templatedMessagesList'">
+
+                                    <v-list-item 
+                                        style="margin-left: 7px; margin-right: 7px;cursor: pointer; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 7px;"
+                                        @click="pickATemplatedMessage(templatedMessage)"
+                                        v-if="templatedMessagesList.length > 0" 
+                                        v-for="(templatedMessage, index) in templatedMessagesList">
+                                    
+                                        <small style="padding: 7px;
+                                                        background-color: rgba(0, 0, 0, 0.3);
+                                                        border-radius: 7px;">{{ templatedMessage.id }}</small>
+                                    
+                                        <div 
+                                            :disabled="true"
+                                            class="ml-4"
+                                            style=" opacity: .7; padding-bottom: 7px; padding-top: 7px; cursor: pointer; display: inline-block; overflow: hidden; text-overflow: ellipsis; text-wrap: nowrap; font-size: 90% !important; margin-top: 0" 
+                                            :value="templatedMessage.text">{{templatedMessage.text}}</div>
+                                    
+                                    </v-list-item>
+
+                                    <small class="ml-4" v-else>Sua lista de templates de menssages está vazia.</small>
+
+                                </v-list>
+        
+                            </div>
+        
+                            <v-card-actions v-if="dialog.dialogRole === 'displayMessage'">
+                            
+                                <v-btn dense color="secondary" style="border-radius: 0; text-transform: lowercase;" @click="dialog.isVisible = false">
+                                    {{dialog.cancelButtonText}} 
+                                    <v-icon class="ml-2">mdi-cancel-circle</v-icon>
+                                </v-btn>
+
+                                <v-spacer></v-spacer>
+                                
+                                <v-btn dense color="primary" style="border-radius: 0; text-transform: lowercase;" @click="dialog.isVisible = false; sendMessages()">
+                                    {{dialog.confirmButtonText}}
+                                    <v-icon class="ml-2">mdi-check-circle</v-icon>
+                                </v-btn>
+                            
+                            </v-card-actions>
+
+                            <v-card-actions v-if="dialog.dialogRole === 'templatedMessagesList'">
+                            
+                                <v-btn block dense color="secondary" style="border-radius: 0; text-transform: lowercase;" @click="dialog.isVisible = false">
+                                    {{dialog.confirmButtonText}}
+                                    <v-icon small class="ml-2">mdi-check-circle</v-icon>
+                                </v-btn>
+                            
+                            </v-card-actions>
+                            
+                        </v-card>
+                    </v-dialog>
+        
+                </v-row>
+             
+            </v-container>
+
+        </v-app>
+
+    </div>
+
+
+    <script src="./js/neutralino.js"></script>
+    <script src="./lib/toastify.min.js"></script>
+    <script src="./api/appBackend.js"></script>
+    <script src="./api/util.js"></script>
+    <script src="./api/localStore.js"></script>
+    <script src="./api/excludedHeaders.js"></script>
+    <script src="./api/testQR.js"></script>
+    <script src="./lib/vue.min.js"></script>
+    <script src="./lib/vuetify.min.js"></script>
+    <script src="./lib/papaparse.min.js"></script>
+    <script src="./js/main.js"></script>
+
+
+</body>
+</html>

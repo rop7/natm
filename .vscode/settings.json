@@ -1,4 +1,8 @@
 {
+    "hide-files.files": [
+        "frontend/package.json.backend.old",
+        "frontend/package.json.old"
+    ],
     "files.exclude": {
         "**/.git": true,
         "**/.svn": true,
@@ -6,23 +10,7 @@
         "**/CVS": true,
         "**/.DS_Store": true,
         "**/Thumbs.db": true,
-        "package.json.old": true,
-        "package.json.backend.old": true,
-        "package-lock.json": true,
-        "neutralinojs.log": true,
-        "neutralino.js.map": true,
-        "bin": true,
-        ".tmp": true,
-        ".vscode": true
-    },
-    "hide-files.files": [
-        "package.json.old",
-        "package.json.backend.old",
-        "package-lock.json",
-        "neutralinojs.log",
-        "neutralino.js.map",
-        "bin",
-        ".tmp",
-        ".vscode"
-    ]
+        "frontend/package.json.backend.old": true,
+        "frontend/package.json.old": true
+    }
 }
